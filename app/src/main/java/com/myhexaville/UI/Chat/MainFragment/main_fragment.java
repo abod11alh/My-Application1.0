@@ -122,7 +122,7 @@ public class main_fragment extends Fragment {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             search_fragment search_fragment=new search_fragment();
             MainActivity.fragment_search=search_fragment;
-            fragmentTransaction.replace(R.id.container_main,search_fragment).commit();
+            fragmentTransaction.replace(R.id.container_main_second,search_fragment).commit();
         }
 
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,8 @@ import com.myhexaville.Logic.Friend.Friendship_sender;
 import com.myhexaville.Logic.JSONData.$_JSONAttributes;
 import com.myhexaville.Logic.JSONData.$_JSON_Search_User_Successful;
 import com.myhexaville.login.R;
+import com.myhexaville.login.SecondActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -106,22 +109,22 @@ public class search_fragment extends Fragment implements    SearchView.OnQueryTe
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem searchItem = null;
+        inflater.inflate(R.menu.menu_fragment_search,menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
         searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-    
-    @Override
-    public boolean onMenuItemActionExpand(MenuItem item) {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
 
-        return true;
-    }
+                return true;
+            }
 
-    @Override
-    public boolean onMenuItemActionCollapse(MenuItem item) {
-      //  FragmentTransaction fragmentTransaction = MainActivity.fragmentManager.beginTransaction();
-     //   fragmentTransaction.replace(R.id.continer_main,MainActivity.fragment_main).commit();
-        return true;
-    }
-});
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                FragmentTransaction fragmentTransaction = SecondActivity.fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_main_second,SecondActivity.main_fragment).commit();
+                return true;
+            }
+        });
         searchItem.expandActionView();
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint("Search");
@@ -185,7 +188,6 @@ public class search_fragment extends Fragment implements    SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        System.out.println("d="+newText);
         if(!newText.equals(""))
             send_to_search(newText);
         else
@@ -201,7 +203,7 @@ public class search_fragment extends Fragment implements    SearchView.OnQueryTe
             jsonObject.put($_JSONAttributes.Type.toString(), "Search_Of_User");
             jsonObject.put($_JSONAttributes.Id.toString(), $_Client.getEmail());
             jsonObject.put($_JSONAttributes.Search_User.toString(),query);
-            $_Client.getDataOutputStreamOnline().writeUTF(jsonObject.toString());
+            $_Client.getDataOutputStreamMessage().writeUTF(jsonObject.toString());
 
         } catch (JSONException e) {
             e.printStackTrace();

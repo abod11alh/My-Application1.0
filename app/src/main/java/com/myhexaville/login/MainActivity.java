@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.myhexaville.Logic.Client.$_Client;
+import com.myhexaville.Logic.Friend.$_FriendInfo;
+import com.myhexaville.Logic.Friend.$_FriendStorgeMangement;
 import com.myhexaville.Logic.JSONData.$_JSON;
 import com.myhexaville.Logic.JSONData.$_JSONAttributes;
 import com.myhexaville.Logic.JSONData.$_JSON_Accept_Friend_Respons;
@@ -37,6 +39,7 @@ import com.myhexaville.Logic.ServerManagment.$_CheckOnline;
 import com.myhexaville.Logic.ServerManagment.$_CheckReciveData;
 import com.myhexaville.Logic.Tools.$_SharedPreferences;
 import com.myhexaville.UI.$_Static_Class;
+import com.myhexaville.UI.Account.FriendPathMangment;
 import com.myhexaville.UI.Account.signin_fragment;
 import com.myhexaville.UI.Account.signup_fragment;
 import com.myhexaville.UI.Account.signup_fragment_tow;
@@ -55,7 +58,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
     public static Context context;
     public static Fragment fragment;
     public static List<$_Message> messages;
+    public static  $_FriendStorgeMangement mangement=new $_FriendStorgeMangement();
 
 
     public static search_fragment fragment_search;
@@ -96,6 +106,40 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+      /*  Thread r=new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    File file=getFilesDir();
+                        System.out.println(file.getPath()+"ab"+File.pathSeparator);
+
+
+
+                    $_FriendStorgeMangement mangement=new $_FriendStorgeMangement();
+                    mangement.setFileOutputFriend(openFileOutput("ab"+File.pathSeparator+"abd@gmail.com.Fi",MODE_PRIVATE));
+                    mangement.setFriendPath(file.getPath());
+                    //FileOutputStream fileOutputStream=openFileOutput("ab"+File.pathSeparator+"test.Fi",MODE_PRIVATE);
+
+                   // ObjectOutputStream objectOutputStream=new ObjectOutputStream(fileOutputStream);
+                   // objectOutputStream.writeObject(new $_FriendInfo("abd@gmail.com","abdo",new byte[5],"test"));
+                    //objectOutputStream.close();
+                    mangement.add(new $_FriendInfo("abd11@gmail.com","abdo",new byte[5],"test"));
+                    mangement.setFileInputFriend(openFileInput("ab"+File.pathSeparator+"abd@gmail.com.Fi"));
+                    // fileInputStream=openFileInput("ab"+File.pathSeparator+"test.Fi");
+                    //ObjectInputStream objectInputStream=new ObjectInputStream(fileInputStream);
+                    $_FriendInfo friendInfo= ($_FriendInfo) mangement.get("abd@gmail.com");
+                    System.out.println(friendInfo.getId());
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        r.start();*/
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         context = this;
@@ -203,6 +247,9 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
                                 main_fragment.setArguments(bundle);
                                 main_fragment.setArguments(bundle);
                                 fragmentTransaction.replace(R.id.continer_main, main_fragment).commit();*/
+                                FriendPathMangment.MainPath=File.pathSeparator+(($_JSON_SignUp_Successful)finalMy_json).getIdReceived();
+                                FriendPathMangment.FriendPath=FriendPathMangment.MainPath+File.pathSeparator+"Friend";
+                                FriendPathMangment.AccountPath=FriendPathMangment.MainPath+File.pathSeparator+"Account";
                               Bundle bundle = new Bundle();
                               bundle.putString("fragment", "main_fragment");
                               Intent intent = new Intent(MainActivity.context,SecondActivity.class);
@@ -241,6 +288,9 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
                                 bundle.putString("data", finalJsonObject.toString());
                                 signup_fragment_tow.setArguments(bundle);
                                 fragmentTransaction.replace(R.id.container_main, signup_fragment_tow).commit();*/
+                                FriendPathMangment.MainPath=File.pathSeparator+(($_JSON_SignUp_Successful)finalMy_json).getIdReceived();
+                                FriendPathMangment.FriendPath=FriendPathMangment.MainPath+File.pathSeparator+"Friend";
+                                FriendPathMangment.AccountPath=FriendPathMangment.MainPath+File.pathSeparator+"Account";
                                Intent intent = new Intent(MainActivity.context, SecondActivity.class);
                                Bundle bundle = new Bundle();
                                bundle.putString("fragment","signup_fragment_tow");
@@ -353,7 +403,6 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
                             DataInputStream dataInputStream = new DataInputStream($_Client.getSocketMessage().getInputStream());
                             byte[] bytes = new byte[Integer.parseInt((($_JSON_Message_Image) my_json).getBytes().toLowerCase())];
                             dataInputStream.readFully(bytes);
-                            System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ = " + bytes);
                             $_Message message = new $_Message_Image((($_JSON_Message_Image) my_json).getIdFrom(), (($_JSON_Message_Image) my_json).getUsername(), "4", $_Static_Class.getCurrentDate(), bytes);
                             if (main_chat_fragment.rooms == null) {
                                 messages.add(message);
@@ -392,12 +441,14 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
                         State_Users.add(jsonArray_State_Users.getString(i));
 
                     }
+                    System.out.println(jsonObject.toString());
                     my_json = new $_JSON_Search_User_Successful("Search_User_Successful", jsonObject.getString($_JSONAttributes.IdRecive.toString()), jsonObject.getBoolean($_JSONAttributes.Done.toString()), Ids, Users_name, State_Users);
                     final $_JSON_Search_User_Successful finalMy_json = ($_JSON_Search_User_Successful) my_json;
                     final JSONObject finalJsonObject = jsonObject;
                     MainActivity.fragmentActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            System.out.println("test");
                             ((search_fragment) MainActivity.fragment_search).set_list_show(finalMy_json);
                         }
                     });
@@ -427,6 +478,7 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
                     MainActivity.fragmentActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            Toast.makeText(context, "Test", Toast.LENGTH_SHORT).show();
 
                             MainActivity.fragment_search.Edit_button((($_JSON_Add_Friend_Response) finalMy_json1).getId_user(), "Remove Request");
                         }
@@ -456,23 +508,47 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
                 }
                 case "Accept_Friend_Response": {
                     my_json = new $_JSON_Accept_Friend_Respons("Accept_Friend_Response", jsonObject.getString($_JSONAttributes.IdRecive.toString()), jsonObject.getBoolean($_JSONAttributes.Done.toString()), jsonObject.getString($_JSONAttributes.Accept_Friend_Id.toString()));
+
+                    $_JSON_Accept_Friend_Respons finalMy_json2 = ($_JSON_Accept_Friend_Respons) my_json;
                     MainActivity.fragmentActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(context, "Test", Toast.LENGTH_SHORT).show();
+
+                            try {
+                                mangement.setFileOutputFriend(context.openFileOutput(FriendPathMangment.FriendPath+File.pathSeparator+ finalMy_json2.getId_user()+".Fi",MODE_PRIVATE));
+                                mangement.add(new $_FriendInfo(finalMy_json2.getId_user(),"",new byte[5],"Hi"));
+                                mangement.setFileInputFriend(context.openFileInput(FriendPathMangment.FriendPath+File.pathSeparator+ finalMy_json2.getId_user()+".Fi"));
+                                $_FriendInfo friendInfo= ($_FriendInfo) mangement.get(finalMy_json2.getId_user());
+                                Toast.makeText(context,friendInfo.getId(),Toast.LENGTH_LONG).show();
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
 
                         }
-                    });
+                });
 
                     break;
                 }
                 case "Friend_Accept_Response": {
                     my_json = new $_JSON_Friend_Accept_Response("Friend_Accept_Response", jsonObject.getString($_JSONAttributes.IdRecive.toString()), jsonObject.getString($_JSONAttributes.Id_Friend_Accept_Response.toString()), jsonObject.getString($_JSONAttributes.user_friend_request.toString()));
 
+                    $_JSON_Friend_Accept_Response finalMy_json3 = ($_JSON_Friend_Accept_Response) my_json;
                     MainActivity.fragmentActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
+                            try {
+                                mangement.setFileOutputFriend(context.openFileOutput(FriendPathMangment.FriendPath+File.pathSeparator+ (($_JSON_Friend_Accept_Response) finalMy_json3).getId_user(),MODE_PRIVATE));
+                                mangement.add(new $_FriendInfo(finalMy_json3.getId_user(),finalMy_json3.getUser_friend_request(),new byte[5],"Hi"));
+                                mangement.setFileInputFriend(context.openFileInput(FriendPathMangment.FriendPath+File.pathSeparator+ finalMy_json3.getId_user()+".Fi"));
+                                $_FriendInfo friendInfo= ($_FriendInfo) mangement.get(finalMy_json3.getId_user());
+                                Toast.makeText(context,friendInfo.getId(),Toast.LENGTH_SHORT).show();
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                     break;
@@ -493,6 +569,7 @@ public class MainActivity extends AppCompatActivity implements signup_fragment.O
                     MainActivity.fragmentActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            Toast.makeText(context, "Test", Toast.LENGTH_SHORT).show();
 
                         }
                     });

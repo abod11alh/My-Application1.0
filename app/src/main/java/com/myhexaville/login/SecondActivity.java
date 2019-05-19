@@ -12,18 +12,21 @@ import com.myhexaville.UI.Account.signup_fragment_tow;
 import com.myhexaville.UI.Chat.MainFragment.MainChat.main_chat_fragment;
 import com.myhexaville.UI.Chat.MainFragment.RoomChat.room_chat;
 import com.myhexaville.UI.Chat.MainFragment.main_fragment;
+import com.myhexaville.UI.Chat.search.search_fragment;
 import com.myhexaville.UI.Notification.notification_fragment;
 
 public class SecondActivity extends AppCompatActivity implements main_fragment.OnFragmentInteractionListener,
         main_chat_fragment.OnFragmentInteractionListener,
         notification_fragment.OnFragmentInteractionListener,
         room_chat.OnFragmentInteractionListener,
-signup_fragment_tow.OnFragmentInteractionListener{
+signup_fragment_tow.OnFragmentInteractionListener ,
+        search_fragment.OnFragmentInteractionListener {
 
     public static FragmentManager fragmentManager;
     private static FragmentTransaction fragmentTransaction;
     public static FragmentActivity fragmentActivity;
     public static Context context;
+    public  static main_fragment main_fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +42,7 @@ signup_fragment_tow.OnFragmentInteractionListener{
             if (savedInstanceState != null) return;
             fragmentTransaction = fragmentManager.beginTransaction();
             if(getIntent().getExtras().getString("fragment").equals("main_fragment")){
-                main_fragment main_fragment = new main_fragment();
+                 main_fragment = new main_fragment();
             /*Bundle bundle = new Bundle();
             bundle.putString("data", finalMy_json.toString());
             main_fragment.setArguments(bundle);

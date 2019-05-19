@@ -16,10 +16,12 @@ public class Friendship_sender {
             @Override
             public void run() {
                 try {
-                    jsonObject.put($_JSONAttributes.Type.toString(),Type);
-                     jsonObject.put($_JSONAttributes.User_Name.toString(),"abod");
-
-                    $_Client.getDataOutputStreamOnline().writeUTF(jsonObject.toString());
+                    JSONObject jsonObject1=new JSONObject();
+                    jsonObject1.put($_JSONAttributes.Type.toString(),Type);
+                    jsonObject1.put($_JSONAttributes.Id.toString(), jsonObject.getString($_JSONAttributes.Id.toString()));
+                    jsonObject1.put(Type_ID,id);
+                    jsonObject1.put($_JSONAttributes.User_Name.toString(),"abod");
+                    $_Client.getDataOutputStreamMessage().writeUTF(jsonObject1.toString());
 
 
                 } catch (JSONException e) {
@@ -29,6 +31,7 @@ public class Friendship_sender {
                 }
             }
         }).start();
+
 
 
 
